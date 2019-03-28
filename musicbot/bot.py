@@ -1272,6 +1272,9 @@ class MusicBot(discord.Client):
         return True
 
     async def cmd_play(self, message, player, channel, author, permissions, leftover_args, song_url):
+        return await self._cmd_play(message, player, channel, author, permissions, leftover_args, song_url, False)
+
+    async def _cmd_play(self, message, player, channel, author, permissions, leftover_args, song_url, head=False):
         """
         Usage:
             {command_prefix}play song_link
@@ -1506,7 +1509,7 @@ class MusicBot(discord.Client):
                     )
 
                 try:
-                    entry, position = await player.playlist.add_entry(song_url, channel=channel, author=author)
+                    entry, position = await player.playlist.add_entry(song_url, head, channel=channel, author=author)
 
                 except exceptions.WrongEntryTypeError as e:
                     if e.use_url == song_url:
@@ -2532,10 +2535,8 @@ class MusicBot(discord.Client):
         await t.leave()
         return Response('Left the guild: `{0.name}` (Owner: `{0.owner.name}`, ID: `{0.id}`)'.format(t))
 
-    async def cmd_wariko(self, channel):
-        log.info("Wariko!")
-        await self.safe_send_message(channel, "wariko!")
-        return
+    async def cmd_wariko(self, message, player, channel, author, permissions, leftover_args, song_url):
+        return await self._cmd_play(message, player, channel, author, permissions, leftover_args, song_url, True)
 
     @dev_only
     async def cmd_breakpoint(self, message):
